@@ -1,0 +1,41 @@
+# Database Configuration
+database:
+  host: localhost
+  port: 5432
+  name: sales_db
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+
+# Data Paths
+data_paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  model_artifacts: models/artifacts
+
+# Model Parameters
+model_params:
+  xgboost:
+    max_depth: 6
+    learning_rate: 0.1
+    n_estimators: 100
+    objective: 'reg:squarederror'
+    
+  kmeans:
+    n_clusters: 5
+    random_state: 42
+
+# MLflow Configuration
+mlflow:
+  tracking_uri: ./mlruns
+  experiment_name: sales_forecasting
+
+# Streamlit Dashboard
+dashboard:
+  title: "Sales Analysis Dashboard"
+  theme: "light"
+  port: 8501
+
+# Power BI Configuration
+power_bi:
+  report_path: reports/sales_analysis.pbix
+  refresh_interval: 3600  # in seconds 
