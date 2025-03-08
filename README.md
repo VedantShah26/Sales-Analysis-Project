@@ -2,6 +2,9 @@
 
 A comprehensive data analysis and machine learning project for retail sales forecasting, customer behavior analysis, and product recommendations.
 
+## Project Overview
+This project uses advanced analytics and machine learning techniques to analyze sales data, predict future sales, and provide actionable insights for business decision-making.
+
 ## Key Features
 
 - **Exploratory Data Analysis (EDA)**
