@@ -1,156 +1,113 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-import yaml
-import joblib
-from datetime import datetime, timedelta
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-
-# Load configuration
-with open('config/config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
+from pathlib import Path
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+from src.analysis.sales_analysis import SalesAnalyzer
 
 # Set page config
 st.set_page_config(
-    page_title=config['dashboard']['title'],
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Sales Analysis Dashboard",
+    page_icon="📊",
+    layout="wide"
 )
 
+# Title and description
+st.title("📊 Sales Analysis Dashboard")
+st.markdown("""
+This dashboard provides insights into sales performance, product analysis, and customer behavior.
+Use the sidebar to navigate between different sections.
+""")
+
+# Initialize the analyzer
+@st.cache_data
 def load_data():
-    """Load processed sales data."""
-    return pd.read_csv('data/processed/processed_sales_data.csv')
+    analyzer = SalesAnalyzer("data/processed/merged_orders.csv")
+    return analyzer
 
-def load_models():
-    """Load trained models."""
-    models = {}
-    model_dir = config['data_paths']['model_artifacts']
-    
-    models['xgboost'] = joblib.load(
-        os.path.join(model_dir, 'xgboost_sales_forecast.joblib')
-    )
-    models['kmeans'] = joblib.load(
-        os.path.join(model_dir, 'kmeans_customer_segments.joblib')
-    )
-    
-    return models
+analyzer = load_data()
 
-def create_sales_trend(data):
-    """Create sales trend visualization."""
-    daily_sales = data.groupby('order_date')['total_sales'].sum().reset_index()
-    
-    fig = px.line(
-        daily_sales,
-        x='order_date',
-        y='total_sales',
-        title='Daily Sales Trend'
-    )
-    return fig
+# Sidebar navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio(
+    "Select a section",
+    ["Overview", "Sales Trends", "Product Analysis", "Customer Insights"]
+)
 
-def create_product_performance(data):
-    """Create product performance visualization."""
-    product_sales = data.groupby('product_id').agg({
-        'total_sales': 'sum',
-        'quantity': 'sum'
-    }).reset_index()
+if page == "Overview":
+    st.header("Overview")
     
-    fig = px.scatter(
-        product_sales,
-        x='quantity',
-        y='total_sales',
-        title='Product Performance',
-        labels={'total_sales': 'Total Sales', 'quantity': 'Units Sold'}
-    )
-    return fig
-
-def create_customer_segments(data, kmeans_model):
-    """Create customer segmentation visualization."""
-    features = data[['total_sales', 'quantity', 'price']]
-    clusters = kmeans_model.predict(features)
+    # Display basic statistics
+    stats = analyzer.get_basic_stats()
+    col1, col2, col3 = st.columns(3)
     
-    fig = px.scatter_3d(
-        data,
-        x='total_sales',
-        y='quantity',
-        z='price',
-        color=clusters,
-        title='Customer Segments'
-    )
-    return fig
-
-def main():
-    """Main function for the Streamlit dashboard."""
-    st.title(config['dashboard']['title'])
+    with col1:
+        st.metric("Total Sales", f"${stats['Total Sales']:,.2f}")
+        st.metric("Average Sale", f"${stats['Average Sale']:,.2f}")
     
-    # Load data and models
-    try:
-        data = load_data()
-        models = load_models()
-        
-        # Sidebar filters
-        st.sidebar.header('Filters')
-        
-        date_range = st.sidebar.date_input(
-            'Select Date Range',
-            value=(
-                data['order_date'].min(),
-                data['order_date'].max()
-            )
-        )
-        
-        # Main dashboard
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader('Sales Trend')
-            sales_trend = create_sales_trend(data)
-            st.plotly_chart(sales_trend, use_container_width=True)
-            
-        with col2:
-            st.subheader('Product Performance')
-            product_perf = create_product_performance(data)
-            st.plotly_chart(product_perf, use_container_width=True)
-        
-        # Customer Segmentation
-        st.subheader('Customer Segmentation')
-        segments = create_customer_segments(data, models['kmeans'])
-        st.plotly_chart(segments, use_container_width=True)
-        
-        # KPIs
-        st.subheader('Key Performance Indicators')
-        kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-        
-        with kpi1:
-            st.metric(
-                'Total Sales',
-                f"${data['total_sales'].sum():,.2f}"
-            )
-            
-        with kpi2:
-            st.metric(
-                'Average Order Value',
-                f"${data['total_sales'].mean():,.2f}"
-            )
-            
-        with kpi3:
-            st.metric(
-                'Total Orders',
-                f"{len(data):,}"
-            )
-            
-        with kpi4:
-            st.metric(
-                'Total Products',
-                f"{data['product_id'].nunique():,}"
-            )
-            
-    except Exception as e:
-        st.error(f"Error loading dashboard: {str(e)}")
+    with col2:
+        st.metric("Total Orders", f"{stats['Total Orders']:,}")
+        st.metric("Unique Products", f"{stats['Unique Products']:,}")
+    
+    with col3:
+        st.metric("Unique Customers", f"{stats['Unique Customers']:,}")
+        st.metric("Date Range", stats['Date Range'])
 
-if __name__ == "__main__":
-    main() 
+elif page == "Sales Trends":
+    st.header("Sales Trends")
+    
+    # Display sales trends
+    fig = analyzer.analyze_sales_trends()
+    if fig:
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Add date range selector
+    st.subheader("Filter by Date Range")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        start_date = st.date_input("Start Date", analyzer.data['order_date'].min().date())
+    with col2:
+        end_date = st.date_input("End Date", analyzer.data['order_date'].max().date())
+
+elif page == "Product Analysis":
+    st.header("Product Analysis")
+    
+    # Display product performance
+    fig, product_data = analyzer.analyze_product_performance()
+    if fig:
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Display detailed product table
+    st.subheader("Product Performance Details")
+    st.dataframe(product_data)
+
+elif page == "Customer Insights":
+    st.header("Customer Insights")
+    
+    # Display customer behavior
+    fig, customer_data = analyzer.analyze_customer_behavior()
+    if fig:
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Display customer segments
+    st.subheader("Customer Segments")
+    customer_data['segment'] = pd.qcut(customer_data['total_spent'], 
+                                     q=4, 
+                                     labels=['Low', 'Medium', 'High', 'VIP'])
+    
+    segment_stats = customer_data.groupby('segment').agg({
+        'customer_id': 'count',
+        'total_spent': ['sum', 'mean']
+    }).round(2)
+    
+    st.dataframe(segment_stats)
+
+# Footer
+st.markdown("---")
+st.markdown("""
+<div style='text-align: center'>
+    <p>Built with Streamlit | Data Analysis Dashboard</p>
+</div>
+""", unsafe_allow_html=True) 

@@ -1,124 +1,96 @@
-# Sales Analysis and Forecasting Project
+# Sales Analysis Project
 
-A comprehensive data analysis and machine learning project for retail sales forecasting, customer behavior analysis, and product recommendations.
+A comprehensive sales analysis project that includes data processing, analysis, and visualization using Python. The project features a Streamlit dashboard for interactive data exploration and insights.
 
-## Project Overview
-This project uses advanced analytics and machine learning techniques to analyze sales data, predict future sales, and provide actionable insights for business decision-making.
+## Features
 
-## Key Features
-
-- **Exploratory Data Analysis (EDA)**
-  - Purchase pattern analysis
-  - Customer behavior insights
-  - Product performance metrics
-  - Seasonal trends identification
-
-- **Machine Learning Models**
-  - K-means clustering for product segmentation
-  - XGBoost for sales forecasting
-  - Collaborative filtering for product recommendations
-  - Association rule mining for basket analysis
-
-- **Interactive Visualizations**
-  - Streamlit dashboard for real-time analytics
-  - Power BI reports for business insights
-  - Interactive charts and graphs
-  - KPI monitoring and tracking
-
-## Project Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd sales-analysis-project
-```
-
-2. Create and activate virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-.\venv\Scripts\activate   # Windows
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Set up environment variables:
-```bash
-cp .env.example .env
-# Add your configurations to .env file
-```
+- Data processing and analysis pipeline
+- Interactive Streamlit dashboard
+- Sales trend analysis
+- Product performance metrics
+- Customer behavior insights
+- Automated report generation
 
 ## Project Structure
 
 ```
 sales-analysis-project/
-├── data/                  # Raw and processed data files
-├── notebooks/            # Jupyter notebooks for analysis
-├── src/                  # Source code
-│   ├── data/            # Data processing scripts
-│   ├── models/          # ML model implementations
-│   ├── visualization/   # Visualization code
-│   └── utils/           # Utility functions
-├── tests/               # Unit tests
-├── dashboard/           # Streamlit dashboard
-├── reports/            # Power BI reports and analytics
-└── config/             # Configuration files
-
+├── data/
+│   ├── raw/           # Raw data files
+│   └── processed/     # Processed data files
+├── src/
+│   ├── data/         # Data processing scripts
+│   └── analysis/     # Analysis scripts
+├── dashboard/        # Streamlit dashboard
+├── notebooks/        # Jupyter notebooks
+├── reports/         # Generated reports and visualizations
+├── tests/           # Unit tests
+└── config/          # Configuration files
 ```
 
-## Features Implementation
+## Installation
 
-1. **Data Processing**
-   - Data cleaning and preprocessing
-   - Feature engineering
-   - Time series preparation
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/sales-analysis-project.git
+cd sales-analysis-project
+```
 
-2. **Machine Learning Models**
-   - Sales forecasting using XGBoost
-   - Customer segmentation using K-means
-   - Product recommendation system
-   - Market basket analysis
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. **Visualization and Reporting**
-   - Interactive Streamlit dashboard
-   - Power BI reports
-   - Performance metrics visualization
-   - Trend analysis charts
+3. Install required packages:
+```bash
+pip install -r requirements.txt
+```
 
-## Technologies Used
+## Usage
 
-- Python 3.8+
-- Pandas & NumPy for data manipulation
-- Scikit-learn & XGBoost for machine learning
-- MLflow for experiment tracking
-- Plotly & Seaborn for visualization
-- Streamlit for web dashboard
-- Power BI for business reporting
-- PostgreSQL for data storage
-- SQLAlchemy for database operations
+1. Generate sample data (if using sample data):
+```bash
+python src/data/generate_sample_data.py
+```
 
-## Getting Started with Development
+2. Run the analysis:
+```bash
+python src/analysis/sales_analysis.py
+```
 
-1. **Data Preparation**
-   - Place your sales data in the `data/raw` directory
-   - Run data preprocessing scripts
+3. Launch the dashboard:
+```bash
+streamlit run dashboard/app.py
+```
 
-2. **Model Training**
-   - Execute notebooks in the `notebooks` directory
-   - Train models using scripts in `src/models`
+## Project Components
 
-3. **Dashboard Setup**
-   - Configure database connection
-   - Run Streamlit dashboard
-   - Set up Power BI reports
+### Data Processing
+- `src/data/generate_sample_data.py`: Generates sample sales data for testing
+- `src/data/download_data.py`: Downloads and processes raw data
+
+### Analysis
+- `src/analysis/sales_analysis.py`: Main analysis script with the `SalesAnalyzer` class
+- `notebooks/01_exploratory_analysis.ipynb`: Jupyter notebook for exploratory data analysis
+
+### Dashboard
+- `dashboard/app.py`: Streamlit dashboard for interactive data visualization
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch
+2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
-5. Create a new Pull Request 
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Built with Python, Pandas, and Streamlit
+- Uses Plotly for interactive visualizations
+- Inspired by real-world sales analysis needs 
